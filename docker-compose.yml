@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  comfyui:
+    image: nvidia/cuda:12.8.0-runtime-ubuntu22.04
+    # 实际生产环境需要把 ComfyUI 也容器化，这里先映射宿主机的 ComfyUI
+    # 简化版：API 容器访问宿主机的 ComfyUI
+    network_mode: host
+    # 或者使用 host.docker.internal（需要额外配置）
+    
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./input:/app/input
+      - ./output:/app/output
+    environment:
+      - COMFYUI_URL=http://host.docker.internal:8188
+    depends_on:
+      - comfyui
